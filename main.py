@@ -31,18 +31,6 @@ courses_data = {
             'Faahfaahinta guud ee Zendrop iyo dropshipping'
         ],
         'link': 'https://teletype.in/@somallibooks/21_0_0Yjtbl'
-    },
-    'custom_chatbot': {
-        'title': 'Custom Chatbot AI Automation',
-        'description': 'Baro sida loo dhiso oo loo maamulo chatbot-yo AI ah oo gaar ah, kuwaas oo otomaatig ka dhigaya hawlahaaga.',
-        'topics': [
-            'Hordhac Chatbot AI Automation',
-            'Qorshaynta iyo Naqshadaynta Chatbot-ka',
-            'Dhismaha Chatbot-ka oo la isticmaalayo aaladaha kala duwan',
-            'Ku xiridda Chatbot-ka API-yada kale',
-            'Bixinta iyo Dib-u-eegista Xogta',
-            'Tijaabinta iyo Hagaajinta Chatbot-ka'
-        ]
     }
 }
 
@@ -51,7 +39,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     main_menu_keyboard = [
         [InlineKeyboardButton("📚 Koorsooyin", callback_data='show_courses')],
         [InlineKeyboardButton("👨‍💻 Talk Human", callback_data='talk_human')],
-        [InlineKeyboardButton("🤖 Talk Bot", callback_data='talk_bot')],
         [InlineKeyboardButton("🛂 Contacts", callback_data='contacts')],
         [InlineKeyboardButton("❓ More Info", callback_data='more_info')],
         [InlineKeyboardButton("☘️ Ibara AI", callback_data='ibara_ai')]
@@ -61,21 +48,43 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def show_courses_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info(f"Received show_courses_menu callback from {update.effective_user.first_name}")
-    keyboard = []
-    for key, course in courses_data.items():
-        keyboard.append([InlineKeyboardButton(course["title"], callback_data=f'info_{key}')])
-    keyboard.append([InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')])
+    keyboard = [
+        [InlineKeyboardButton("🆓 Free", callback_data='free_courses')],
+        [InlineKeyboardButton("💰 Paid", callback_data='paid_courses')],
+        [InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.callback_query.edit_message_text('Fadlan dooro koorso:', reply_markup=reply_markup)
+    await update.callback_query.edit_message_text('Fadlan dooro nooca koorsada:', reply_markup=reply_markup)
+
+async def show_free_courses(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("🤖 AI Chatbot", callback_data='ai_chatbot')],
+        [InlineKeyboardButton("🎬 AI Video Editing", callback_data='ai_video_editing')],
+        [InlineKeyboardButton("🛒 AI Shopify", callback_data='ai_shopify')],
+        [InlineKeyboardButton("🎥 Adobe Premiere Pro", callback_data='adobe_premiere')],
+        [InlineKeyboardButton("📖 Basic Language", callback_data='basic_language')],
+        [InlineKeyboardButton("📚 Intermediate Language", callback_data='intermediate_language')],
+        [InlineKeyboardButton("🧠 Learn AI", callback_data='learn_ai')],
+        [InlineKeyboardButton("⬅️ Back to Courses", callback_data='show_courses')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    message = "Waxaan bixinaa koorsooyin ugu horreeya ee Soomaalida ah oo ku saabsan abuurista chatbot-yo ku hadla luqadaada, oo aan u baahnayn aqoon barnaamij. Tani waa isbeddel caalami ah, waxaanan kaa caawin doonaa inaad isticmaasho AI telefoonkaaga ama kombuyuutarkaaga si aad u abuurto AI chatbot-yo iyo tafariiqda fiidiyowga adigoo isticmaalaya AI."
+    await update.callback_query.edit_message_text(message, reply_markup=reply_markup)
+
+async def show_paid_courses(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("📱 WhatsApp Group", url="https://chat.whatsapp.com/KzkcjwraeYhCsUXaexgNyM")],
+        [InlineKeyboardButton("📞 Contact @Mfaratoon", url="https://t.me/Mfaratoon")],
+        [InlineKeyboardButton("🏘️ WhatsApp Community", url="https://chat.whatsapp.com/CEDDPttA5a4K6ZkQsDp4ah")],
+        [InlineKeyboardButton("⬅️ Back to Courses", callback_data='show_courses')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    message = "Waxaa jira koorsooyin premium ah oo leh khidmad yar oo bishii la bixiyo. Tani waxay ku siinaysaa casharrada gaarka ah afar habeen todobaadkii. La xiriir macallinka iyo kooxda AI iyada oo loo marayo kanaaladan:"
+    await update.callback_query.edit_message_text(message, reply_markup=reply_markup)
 
 async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info(f"Received /courses command from {update.effective_user.first_name}")
-    keyboard = []
-    for key, course in courses_data.items():
-        keyboard.append([InlineKeyboardButton(course["title"], callback_data=f'info_{key}')])
-    keyboard.append([InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')])
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text('Fadlan dooro koorso:', reply_markup=reply_markup)
+    await show_courses_menu(update, context)
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -86,7 +95,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         main_menu_keyboard = [
             [InlineKeyboardButton("📚 Koorsooyin", callback_data='show_courses')],
             [InlineKeyboardButton("👨‍💻 Talk Human", callback_data='talk_human')],
-            [InlineKeyboardButton("🤖 Talk Bot", callback_data='talk_bot')],
             [InlineKeyboardButton("🛂 Contacts", callback_data='contacts')],
             [InlineKeyboardButton("❓ More Info", callback_data='more_info')],
             [InlineKeyboardButton("☘️ Ibara AI", callback_data='ibara_ai')]
@@ -95,32 +103,92 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text='Welcome to the Course Bot.', reply_markup=reply_markup)
     elif callback_data == 'show_courses':
         await show_courses_menu(update, context)
-    elif callback_data.startswith('info_'):
-        course_key = callback_data.replace('info_', '')
-        if course_key in courses_data:
-            course = courses_data[course_key]
-            message = f'**{course["title"]}**\n\n'
-            message += f'{course["description"]}\n\n'
-            message += '**Mawduucyada Koorsooyinka:**\n'
-            for i, topic in enumerate(course['topics']):
-                message += f'{i+1}. {topic}\n'
-            if 'link' in course:
-                message += f'\n**Ku biir koorsada:** [Halkan ka riix]({course["link"]})'
-            
-            # Add back button
-            back_keyboard = [[InlineKeyboardButton("⬅️ Back to Courses", callback_data='show_courses')]]
-            reply_markup = InlineKeyboardMarkup(back_keyboard)
-            await query.edit_message_text(text=message, parse_mode='Markdown', reply_markup=reply_markup)
-        else:
-            await query.edit_message_text(text='Koorsooyinkaas lama helin. Fadlan hubi magaca koorsada.')
+    elif callback_data == 'free_courses':
+        await show_free_courses(update, context)
+    elif callback_data == 'paid_courses':
+        await show_paid_courses(update, context)
+    elif callback_data == 'ai_chatbot':
+        keyboard = [
+            [InlineKeyboardButton("📚 AI Automation and Chatbots Course", url="https://open.substack.com/pub/mfaratoon/p/koorsada-ai-automation-and-chatbots?r=ogczv&utm_campaign=post&utm_medium=web&showWelcomeOnShare=true")],
+            [InlineKeyboardButton("📝 Register Here", url="https://teletype.in/@somallibooks/21_0_0Yjtbl")],
+            [InlineKeyboardButton("📚 Lesson", url="https://t.me/+eJxxMKtunMcwODhk")],
+            [InlineKeyboardButton("💬 WhatsApp Group", url="https://chat.whatsapp.com/KzkcjwraeYhCsUXaexgNyM")],
+            [InlineKeyboardButton("⬅️ Back", callback_data='free_courses')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        message = "Halkan waxaad ku baran doontaa sida loo abuuro chatbot-yo aamusan oo aan hore u lahayn khibrad IT ama barnaamij. Tani waxay ku jirtaa abuurista Telegram, WhatsApp, iyo Messenger chatbot-yo gaar ah."
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    elif callback_data == 'ai_video_editing':
+        keyboard = [
+            [InlineKeyboardButton("🎬 9 AI Video Editing Lessons", url="https://open.substack.com/pub/mfaratoon/p/9-cashar-ai-video-editing?r=ogczv&utm_campaign=post&utm_medium=web&showWelcomeOnShare=true")],
+            [InlineKeyboardButton("💬 WhatsApp Group", url="https://chat.whatsapp.com/DIu9h23H5R28ozxfMFTkdq")],
+            [InlineKeyboardButton("⬅️ Back", callback_data='free_courses')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        message = "Waxaa jira sagaal cashar oo bilaash ah oo daboolaya hababka ugu dambeeyay ee tafariiqda fiidiyowga adigoo isticmaalaya adeegyo iyo websaydhyo casri ah. Waxaan si faahfaahsan uga hadli doonaa kuwan sagaalka cashar."
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    elif callback_data == 'ai_shopify':
+        keyboard = [
+            [InlineKeyboardButton("🛒 Ku biir koorsada", url="https://teletype.in/@somallibooks/21_0_0Yjtbl")],
+            [InlineKeyboardButton("⬅️ Back", callback_data='free_courses')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        course = courses_data['ai_shopify']
+        message = f'**{course["title"]}**\n\n'
+        message += f'{course["description"]}\n\n'
+        message += '**Mawduucyada Koorsooyinka:**\n'
+        for i, topic in enumerate(course['topics']):
+            message += f'{i+1}. {topic}\n'
+        await query.edit_message_text(text=message, parse_mode='Markdown', reply_markup=reply_markup)
+    elif callback_data == 'adobe_premiere':
+        keyboard = [
+            [InlineKeyboardButton("📱 Telegram Group", url="https://t.me/Mfaratoon")],
+            [InlineKeyboardButton("⬅️ Back", callback_data='free_courses')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        message = "Qaybtan waxay ka kooban tahay casharrada fudud iyo aasaasiga ah ee sharaxaya ama bara tafariiqda fiidiyowga aasaasiga ah adigoo isticmaalaya Adobe Premiere Pro CC 2020. Koorsadani waxay loogu talagalay kuwa doonaya inay bartaan aasaasiga waxayna si fiican u baran karaan iyada oo loo marayo koorsadan aasaasiga ah."
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    elif callback_data == 'basic_language':
+        keyboard = [
+            [InlineKeyboardButton("📘 @somalienglish3", url="https://t.me/somalienglish3")],
+            [InlineKeyboardButton("🤖 @maseexatobot", url="https://t.me/maseexatobot")],
+            [InlineKeyboardButton("⬅️ Back", callback_data='free_courses')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        message = "Fasalkan waa mid aasaasi ah, casharradana waxaa bara macallimiin Soomaali ah oo iskaa u tabarucay walaalahoodii. Fadlan eeg ID-ga hoose.\n\nSidoo kale, bot-ka @maseexatobot ayaa kaa caawin doona. Fadlan had iyo jeer isticmaal calaamadda \"/\" markaad furto bot-ka."
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    elif callback_data == 'intermediate_language':
+        keyboard = [
+            [InlineKeyboardButton("📚 @somalienglish1", url="https://t.me/somalienglish1")],
+            [InlineKeyboardButton("🤖 @maseexatobot", url="https://t.me/maseexatobot")],
+            [InlineKeyboardButton("⬅️ Back", callback_data='free_courses')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        message = "Waxaan haynaa fasallo bilaash ah oo Soomaali-Ingiriisi ah oo loogu talagalay kuwa iskood wax u barata. Waxaad ka heli kartaa koorsooyin iyo fasallo bilaash ah, oo leh 39k, 15k, iyo 10k arday Soomaali ah.\n\nHaddii aad tahay heer dhexe luqadda, fasal luqad dhexe ayaa hadda socda oo si weyn u hagaajin doona barashada luqadda heerka dhexe."
+        await query.edit_message_text(message, reply_markup=reply_markup)
+    elif callback_data == 'learn_ai':
+        keyboard = [
+            [InlineKeyboardButton("🎓 Classroom", url="https://t.me/+eJxxMKtunMcwODhk")],
+            [InlineKeyboardButton("📚 Google Classrooms", url="https://classroom.google.com/c/ODAzMzUwNDIyOTU0?cjc=sdvvlyc2")],
+            [InlineKeyboardButton("⬅️ Back", callback_data='free_courses')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        message = "Waxaa jira meelo badan oo aan ku bixinno casharrada bilaash ah ee AI automation iyo chatbot-yada, iyo sidoo kale wararka ugu dambeeyay ee AI. Kuwani waa qaar ka mid ah meelaha haddii aad xiisaynayso.\n\nGaar ahaan, haddii aad ku biirto fasalka Telegram, bot-ku wuxuu ka kooban yahay casharrada. Kaliya waxaad u baahan tahay inaad codsato, oo markaad ku biirto, waxaan qori doonaa tirooyinka sida \"cashar 1\" ama \"cashar 2\" ilaa 8 cashar oo isku xiran oo aad daawan karto, oo dhammaantood ku saabsan AI chatbot-yada."
+        await query.edit_message_text(message, reply_markup=reply_markup)
     elif callback_data == 'talk_human':
-        back_keyboard = [[InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]]
-        reply_markup = InlineKeyboardMarkup(back_keyboard)
-        await query.edit_message_text(text='Fadlan sug inta aan kugu xirayo qofka ku caawinaya. \n\nFadlan la xiriir: @M_F_A_R_A_T_O_O_N', reply_markup=reply_markup)
-    elif callback_data == 'talk_bot':
-        back_keyboard = [[InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]]
-        reply_markup = InlineKeyboardMarkup(back_keyboard)
-        await query.edit_message_text(text='Waxaan ahay bot, waxaan ku siin karaa macluumaad ku saabsan koorsooyinka. \n\nFadlan isticmaal amarka /courses si aad u aragto koorsooyinka.', reply_markup=reply_markup)
+        keyboard = [
+            [InlineKeyboardButton("📱 Telegram: @Mfaratoon", url="https://t.me/Mfaratoon")],
+            [InlineKeyboardButton("🤖 AI BOT Course", url="https://chat.whatsapp.com/KzkcjwraeYhCsUXaexgNyM")],
+            [InlineKeyboardButton("🎬 AI Video Editing", url="https://chat.whatsapp.com/DIu9h23H5R28ozxfMFTkdq")],
+            [InlineKeyboardButton("🎓 AI Learning Class", url="https://chat.whatsapp.com/CEDDPttA5a4K6ZkQsDp4ah")],
+            [InlineKeyboardButton("🎥 AI Training Team", url="https://loom.com/invite/f510cb6235b947838f247150307bfbeb")],
+            [InlineKeyboardButton("🔧 @Ogaysiiyebot", url="https://t.me/Ogaysiiyebot")],
+            [InlineKeyboardButton("🔧 @fogaanaragbot", url="https://t.me/fogaanaragbot")],
+            [InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        message = "**Macluumaadka Xiriirka**\n\n💬 **WhatsApp Qolal:**\n🔥 **Maamul bot-kaaga:** @Ogaysiiyebot ama @fogaanaragbot"
+        await query.edit_message_text(text=message, parse_mode='Markdown', reply_markup=reply_markup)
     elif callback_data == 'contacts':
         contacts_keyboard = [
             [InlineKeyboardButton("📱 Gudoomiye M Yasin Telegram", url="https://t.me/Mfaratoon")],
