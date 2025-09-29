@@ -202,9 +202,27 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup = InlineKeyboardMarkup(contacts_keyboard)
         await query.edit_message_text(text='Waxaad naga heli kartaa goobahan:', reply_markup=reply_markup)
     elif callback_data == 'more_info':
-        back_keyboard = [[InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]]
-        reply_markup = InlineKeyboardMarkup(back_keyboard)
-        await query.edit_message_text(text='Wixii macluumaad dheeraad ah, fadlan booqo website-kayaga: www.mfaratoon.com', reply_markup=reply_markup)
+        keyboard = [
+            [InlineKeyboardButton("📝 Isqor Koorsooyin", url="https://www.jotform.com/agent/01982620386371ba9336e5f880caada9e1e8")],
+            [InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        message = """**Koorsooyinka aan bixino waxaa ka mid ah:**
+
+🎬 **AI Video Editing** - Bilaash
+💻 **Python Afsomali-Basic**
+🌐 **AI Web Designing**
+🤖 **AI ChatGPT-Prompt {Basic}+**
+📲 **Instagram Automation Business Bot**
+📸 **Telegram Automation Business Bot**
+📞 **Messenger Automation Business Bot**
+
+**Koorsooyinka aan 4 ka mid ah koorsooyin dhamaan free ayaa ka dhignay, Koorsooyinkaas oo dhan 2 Sano Fasax ayaa ka dhignay Dhalinyar waad u qalataan ee ka faa,iidaysta aniga rate fiican naga bixiya intaasaa naga badan sxbyaal lacagtana ka qaalisan.**
+
+Waxaa jira qaar ka mid ah koorsooyinka oo bilaash ah, tusaale ahaan AI Video Editing. Haddii aad xiiseyneyso, waxaan ku siin karaa macluumaad dheeri ah oo ku saabsan sida loo isqoro iyo shuruudaha koorsada. 
+
+Waxaan ku faraxsanahay inaad bilowday safarkaaga barashada automation iyo AI, taasoo fursado badan kuu horseedi karta mustaqbalka shaqo."""
+        await query.edit_message_text(text=message, parse_mode='Markdown', reply_markup=reply_markup)
     elif callback_data == 'ibara_ai':
         back_keyboard = [[InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]]
         reply_markup = InlineKeyboardMarkup(back_keyboard)
