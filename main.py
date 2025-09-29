@@ -49,7 +49,7 @@ courses_data = {
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info(f"Received /start command from {update.effective_user.first_name}")
     main_menu_keyboard = [
-        [InlineKeyboardButton("Koorsooyin", callback_data='show_courses')],
+        [InlineKeyboardButton("📚 Koorsooyin", callback_data='show_courses')],
         [InlineKeyboardButton("👨‍💻 Talk Human", callback_data='talk_human')],
         [InlineKeyboardButton("🤖 Talk Bot", callback_data='talk_bot')],
         [InlineKeyboardButton("🛂 Contacts", callback_data='contacts')],
@@ -84,7 +84,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     callback_data = query.data
     if callback_data == 'main_menu':
         main_menu_keyboard = [
-            [InlineKeyboardButton("Koorsooyin", callback_data='show_courses')],
+            [InlineKeyboardButton("📚 Koorsooyin", callback_data='show_courses')],
             [InlineKeyboardButton("👨‍💻 Talk Human", callback_data='talk_human')],
             [InlineKeyboardButton("🤖 Talk Bot", callback_data='talk_bot')],
             [InlineKeyboardButton("🛂 Contacts", callback_data='contacts')],
@@ -106,19 +106,41 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 message += f'{i+1}. {topic}\n'
             if 'link' in course:
                 message += f'\n**Ku biir koorsada:** [Halkan ka riix]({course["link"]})'
-            await query.edit_message_text(text=message, parse_mode='Markdown')
+            
+            # Add back button
+            back_keyboard = [[InlineKeyboardButton("⬅️ Back to Courses", callback_data='show_courses')]]
+            reply_markup = InlineKeyboardMarkup(back_keyboard)
+            await query.edit_message_text(text=message, parse_mode='Markdown', reply_markup=reply_markup)
         else:
             await query.edit_message_text(text='Koorsooyinkaas lama helin. Fadlan hubi magaca koorsada.')
     elif callback_data == 'talk_human':
-        await query.edit_message_text(text='Fadlan sug inta aan kugu xirayo qofka ku caawinaya. \n\nFadlan la xiriir: @M_F_A_R_A_T_O_O_N')
+        back_keyboard = [[InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]]
+        reply_markup = InlineKeyboardMarkup(back_keyboard)
+        await query.edit_message_text(text='Fadlan sug inta aan kugu xirayo qofka ku caawinaya. \n\nFadlan la xiriir: @M_F_A_R_A_T_O_O_N', reply_markup=reply_markup)
     elif callback_data == 'talk_bot':
-        await query.edit_message_text(text='Waxaan ahay bot, waxaan ku siin karaa macluumaad ku saabsan koorsooyinka. \n\nFadlan isticmaal amarka /courses si aad u aragto koorsooyinka.')
+        back_keyboard = [[InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]]
+        reply_markup = InlineKeyboardMarkup(back_keyboard)
+        await query.edit_message_text(text='Waxaan ahay bot, waxaan ku siin karaa macluumaad ku saabsan koorsooyinka. \n\nFadlan isticmaal amarka /courses si aad u aragto koorsooyinka.', reply_markup=reply_markup)
     elif callback_data == 'contacts':
-        await query.edit_message_text(text='Waxaad naga heli kartaa: \n\nEmail: mfaratoon@gmail.com \nTelefoon: +252617777777')
+        contacts_keyboard = [
+            [InlineKeyboardButton("📱 Gudoomiye M Yasin Telegram", url="https://t.me/Mfaratoon")],
+            [InlineKeyboardButton("📞 WhatsApp Number", url="https://wa.me/15873064137")],
+            [InlineKeyboardButton("🤖 AI BOT (Automation) 4 Days Course", url="https://chat.whatsapp.com/KzkcjwraeYhCsUXaexgNyM")],
+            [InlineKeyboardButton("🎬 AI Video Editing", url="https://chat.whatsapp.com/DIu9h23H5R28ozxfMFTkdq")],
+            [InlineKeyboardButton("📹 Loom Free Screen Recording", url="https://loom.com/invite/f510cb6235b947838f247150307bfbeb")],
+            [InlineKeyboardButton("🎓 Fasalka Barashada AI", url="https://chat.whatsapp.com/CEDDPttA5a4K6ZkQsDp4ah")],
+            [InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]
+        ]
+        reply_markup = InlineKeyboardMarkup(contacts_keyboard)
+        await query.edit_message_text(text='Waxaad naga heli kartaa goobahan:', reply_markup=reply_markup)
     elif callback_data == 'more_info':
-        await query.edit_message_text(text='Wixii macluumaad dheeraad ah, fadlan booqo website-kayaga: www.mfaratoon.com')
+        back_keyboard = [[InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]]
+        reply_markup = InlineKeyboardMarkup(back_keyboard)
+        await query.edit_message_text(text='Wixii macluumaad dheeraad ah, fadlan booqo website-kayaga: www.mfaratoon.com', reply_markup=reply_markup)
     elif callback_data == 'ibara_ai':
-        await query.edit_message_text(text='Waxaad ka heli kartaa macluumaad ku saabsan Ibara AI adigoo booqanaya: www.ibara.ai')
+        back_keyboard = [[InlineKeyboardButton("⬅️ Back to Main Menu", callback_data='main_menu')]]
+        reply_markup = InlineKeyboardMarkup(back_keyboard)
+        await query.edit_message_text(text='Waxaad ka heli kartaa macluumaad ku saabsan Ibara AI adigoo booqanaya: www.ibara.ai', reply_markup=reply_markup)
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token("6265456404:AAHq5Y1ITY2BW7PalmkMw0m6Er2cjuVkHbk").build()
