@@ -2,7 +2,8 @@ import logging
 import os
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler, MessageHandler, filters, ConversationHandler
+from openai import OpenAI
 
 load_dotenv()
 
@@ -10,6 +11,12 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+
+# Initialize OpenAI client
+openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+# States for conversation
+AI_CHAT = 1
 
 courses_data = {
     'ai_shopify': {
@@ -43,6 +50,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Received /start command from {update.effective_user.first_name}")
     main_menu_keyboard = [
         [InlineKeyboardButton("📚 Koorsooyin", callback_data='show_courses')],
+        [InlineKeyboardButton("🤖 La Hadal AI", callback_data='ai_chat')],
         [InlineKeyboardButton("👨‍💻 Talk Human", callback_data='talk_human')],
         [InlineKeyboardButton("🛂 Contacts", callback_data='contacts')],
         [InlineKeyboardButton("❓ More Info", callback_data='more_info')],
@@ -108,6 +116,110 @@ async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await show_courses_menu(update, context)
 
 
+async def ai_chat_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Start AI chat mode"""
+    logging.info(
+        f"User {update.effective_user.first_name} started AI chat")
+    context.user_data['ai_chat_mode'] = True
+    context.user_data['chat_history'] = []
+
+    back_keyboard = [[InlineKeyboardButton(
+        "⬅️ Ku Noqo Menu", callback_data='ai_chat_back')]]
+    reply_markup = InlineKeyboardMarkup(back_keyboard)
+    await update.callback_query.edit_message_text(
+        "🤖 **AI Taliyaha Adigu Ku Hadal!**\n\n"
+        "Waxaan kaasoo ah AI taliyah oo lagu isticmaali karo in lagu jawaabio su'aalaha ardada iyo " +
+        "buug ahaan ama wax iska warran.\n\n"
+        "Fadlan qor su'aalahaaga oo aan kugu jawaabin doono! ✍️\n\n"
+        "Markad dhamaatid, puusy 'Ku Noqo Menu' sidii aad doonaysid.",
+        parse_mode='Markdown',
+        reply_markup=reply_markup
+    )
+    return AI_CHAT
+
+
+async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle user messages in AI chat mode"""
+    if not context.user_data.get('ai_chat_mode'):
+        return
+
+    user_message = update.message.text
+    user_name = update.effective_user.first_name
+
+    logging.info(f"AI Chat - {user_name}: {user_message}")
+
+    # Show typing indicator
+    await update.message.chat.send_action("typing")
+
+    try:
+        # Add user message to history
+        if 'chat_history' not in context.user_data:
+            context.user_data['chat_history'] = []
+
+        context.user_data['chat_history'].append({
+            "role": "user",
+            "content": user_message
+        })
+
+        # Get response from OpenAI
+        response = openai_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=context.user_data['chat_history'],
+            max_tokens=500,
+            temperature=0.7
+        )
+
+        ai_response = response.choices[0].message.content
+
+        # Add AI response to history
+        context.user_data['chat_history'].append({
+            "role": "assistant",
+            "content": ai_response
+        })
+
+        # Keep only last 10 messages to avoid token limit
+        if len(context.user_data['chat_history']) > 20:
+            context.user_data['chat_history'] = context.user_data['chat_history'][-20:]
+
+        # Send response
+        await update.message.reply_text(ai_response)
+
+    except Exception as e:
+        logging.error(f"Error in AI chat: {str(e)}")
+        await update.message.reply_text(
+            f"❌ Waxaa dhacday khalad: {str(e)}\n\n"
+            "Fadlan isku day mar kale."
+        )
+
+    return AI_CHAT
+
+
+async def handle_ai_chat_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Go back from AI chat to main menu"""
+    context.user_data['ai_chat_mode'] = False
+    context.user_data['chat_history'] = []
+
+    query = update.callback_query
+    await query.answer()
+
+    main_menu_keyboard = [
+        [InlineKeyboardButton("📚 Koorsooyin", callback_data='show_courses')],
+        [InlineKeyboardButton("🤖 La Hadal AI", callback_data='ai_chat')],
+        [InlineKeyboardButton("👨‍💻 Talk Human", callback_data='talk_human')],
+        [InlineKeyboardButton("🛂 Contacts", callback_data='contacts')],
+        [InlineKeyboardButton("❓ More Info", callback_data='more_info')],
+        [InlineKeyboardButton("☘️ Ibara AI", callback_data='ibara_ai')]
+    ]
+    reply_markup = InlineKeyboardMarkup(main_menu_keyboard)
+    await query.edit_message_text(text='Welcome to the Course Bot.', reply_markup=reply_markup)
+
+
+async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logging.info(
+        f"Received /courses command from {update.effective_user.first_name}")
+    await show_courses_menu(update, context)
+
+
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -118,6 +230,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton(
                 "📚 Koorsooyin", callback_data='show_courses')],
             [InlineKeyboardButton(
+                "🤖 La Hadal AI", callback_data='ai_chat')],
+            [InlineKeyboardButton(
                 "👨‍💻 Talk Human", callback_data='talk_human')],
             [InlineKeyboardButton("🛂 Contacts", callback_data='contacts')],
             [InlineKeyboardButton("❓ More Info", callback_data='more_info')],
@@ -127,6 +241,10 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(text='Welcome to the Course Bot.', reply_markup=reply_markup)
     elif callback_data == 'show_courses':
         await show_courses_menu(update, context)
+    elif callback_data == 'ai_chat':
+        await ai_chat_start(update, context)
+    elif callback_data == 'ai_chat_back':
+        await handle_ai_chat_back(update, context)
     elif callback_data == 'free_courses':
         await show_free_courses(update, context)
     elif callback_data == 'paid_courses':
@@ -292,6 +410,12 @@ if __name__ == '__main__':
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("courses", courses))
+
+    # Message handler for AI chat
+    application.add_handler(MessageHandler(
+        filters.TEXT & ~filters.COMMAND, handle_ai_message))
+
+    # Callback query handler for buttons
     application.add_handler(CallbackQueryHandler(button))
 
     application.run_polling()
