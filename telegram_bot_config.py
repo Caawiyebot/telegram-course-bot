@@ -3,8 +3,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, CallbackQueryHandler
 
 logging.basicConfig(
-    format=
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
@@ -45,12 +44,21 @@ courses_data = {
     }
 }
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logging.info(f"Received /start command from {update.effective_user.first_name}")
+    logging.info(
+        f"Received /start command from {update.effective_user.first_name}")
     await update.message.reply_text(f'Hello {update.effective_user.first_name}! Welcome to the NLA Course Bot. Type /courses to see available courses.')
 
-async def courses(update: Update, context: ContextTypes.DATA_TYPE):
-    logging.info(f"Received /courses command from {update.effective_user.first_name}")
-    keyboard = [
-        [InlineKeyboardButton("AI Shopify Store Pro", callback_data=\
 
+async def courses(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logging.info(
+        f"Received /courses command from {update.effective_user.first_name}")
+    keyboard = [
+        [InlineKeyboardButton("AI Shopify Store Pro",
+                              callback_data='ai_shopify')],
+        [InlineKeyboardButton("Custom Chatbot AI",
+                              callback_data='custom_chatbot')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("Choose a course:", reply_markup=reply_markup)
